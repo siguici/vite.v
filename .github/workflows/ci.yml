@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  phi:
+    name: 👷 Vite.v on ${{ matrix.operating-system }}
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      matrix:
+        operating-system: [ubuntu-latest]
+    steps:
+      - name: 📥 Checkout (V tests)
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Vlang
+        run: |
+          git clone https://github.com/vlang/v $HOME/v
+          cd $HOME/v
+          make
+          sudo ./v symlink
+
+      - name: ✅ Verify Code Format
+        run: v fmt -verify .
+
+      - name: 🧪 Run V Tests
+        run: v test .
