@@ -1,14 +1,14 @@
 module vite
 
-type AttributeValue = string | bool
-type TagContent = string | []Tag
+pub type AttributeValue = string | bool
+pub type TagContent = string | []Tag
 
-struct Attribute {
+pub struct Attribute {
 	name  string
 	value AttributeValue
 }
 
-struct Tag {
+pub struct Tag {
 mut:
 	name    string @[required]
 	attrs   []Attribute

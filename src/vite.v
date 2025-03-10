@@ -5,7 +5,7 @@ import json
 import veb
 
 @[params]
-struct ViteConfig {
+pub struct ViteConfig {
 	manifest_file string = 'manifest.json'
 	hot_file      string = 'hot'
 	public_dir    string = 'public'
@@ -13,12 +13,12 @@ struct ViteConfig {
 }
 
 @[params]
-struct AssetOptions {
+pub struct AssetOptions {
 	is_dev    bool
 	use_react bool
 }
 
-struct Vite {
+pub struct Vite {
 mut:
 	manifest_file   string @[required]
 	hot_file        string @[required]
@@ -30,7 +30,7 @@ mut:
 	manifest_loaded bool
 }
 
-struct ViteAsset {
+pub struct ViteAsset {
 	file             string @[required]
 	name             string
 	src              string
@@ -41,7 +41,7 @@ struct ViteAsset {
 	dynamic_imports  []string
 }
 
-type ViteManifest = map[string]ViteAsset
+pub type ViteManifest = map[string]ViteAsset
 
 pub fn Vite.new(config ViteConfig) Vite {
 	mut v := Vite{
