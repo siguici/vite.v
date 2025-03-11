@@ -113,6 +113,8 @@ pub fn (mut v Vite) asset(name string) veb.RawHtml {
 			v.style(base + chunk)
 		} else if v.is_js(chunk) {
 			v.preload(base + chunk)
+		} else {
+			''
 		}
 	}
 
@@ -120,6 +122,8 @@ pub fn (mut v Vite) asset(name string) veb.RawHtml {
 		v.style(base + path)
 	} else if v.is_js(path) {
 		v.defer_script(base + path, '')
+	} else {
+		''
 	}
 
 	return html
