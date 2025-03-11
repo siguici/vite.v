@@ -3,6 +3,7 @@ module vite
 import os
 import json
 import veb
+import veb.assets
 
 @[params]
 pub struct ViteConfig {
@@ -19,6 +20,7 @@ pub struct AssetOptions {
 }
 
 pub struct Vite {
+	assets.AssetManager
 mut:
 	manifest_file   string @[required]
 	hot_file        string @[required]
