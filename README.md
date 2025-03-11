@@ -1,14 +1,23 @@
 # Vite.v <span><img src="https://github.com/siguici/art/blob/HEAD/images/v-vite.svg" alt="⚡" width="24" /></span>
 
-**Vite.v** is a V module designed to integrate **Veb**
-applications seamlessly with **Vite.js**.
+**Vite.v** is a V module that acts as an adapter for integrating
+[Vlang](https://vlang.io/) applications with [Vite.js](https://vitejs.dev/).
 It simplifies frontend asset handling while ensuring high performance and flexibility.
 
 ## 🚀 Features
 
-- 🔌 Tight integration between **Veb** and **Vite**
+- 🔌 Tight integration between **V** and **Vite**
 - ⚡ Fast builds with optimized asset processing
 - 🎯 Simple configuration for effortless usage
+
+## ⚙️ Requirements
+
+Ensure you have the following installed:
+
+- [V](https://vlang.io) (latest version)
+- [Vite](https://vitejs.dev) (for frontend compilation)
+- [v-vite](https://npm.im/v-vite) (a Vite plugin adapted to V)
+  or use the [V Vite Starter template](https://github.com/v-vite/starter)
 
 ## 📦 Installation
 
@@ -46,7 +55,7 @@ Vite.v is exclusively designed to work with **Veb** ([Veb documentation](https:/
 module main
 
 import veb
-import siguici.vite { Vite, ViteConfig }
+import siguici.vite { Vite }
 
 pub struct Context {
     veb.Context
