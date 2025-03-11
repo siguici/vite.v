@@ -111,14 +111,14 @@ pub fn (mut v Vite) asset(name string) veb.RawHtml {
 	for chunk in imports {
 		html += if v.is_css(chunk) {
 			v.style(base + chunk)
-		} else {
+		} else if v.is_js(chunk) {
 			v.preload(base + chunk)
 		}
 	}
 
 	html += if v.is_css(path) {
 		v.style(base + path)
-	} else {
+	} else if v.is_js(path) {
 		v.defer_script(base + path, '')
 	}
 
@@ -134,6 +134,17 @@ pub fn (mut v Vite) chunk(name string) ViteAsset {
 fn (v Vite) is_css(path string) bool {
 	return match os.file_ext(path) {
 		'.css', '.less', '.sass', '.scss', '.styl', '.stylus', '.pcss', '.postcss' {
+			true
+		}
+		else {
+			false
+		}
+	}
+}
+
+fn (v Vite) is_js(path string) bool {
+	return match os.file_ext(path) {
+		'.js', '.cjs', '.mjs', '.jsx', '.ts', '.tsx', '.cts', '.mts' {
 			true
 		}
 		else {
