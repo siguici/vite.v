@@ -141,7 +141,7 @@ fn (v Vite) is_css(path string) bool {
 }
 
 pub fn (v Vite) dev_scripts(options AssetOptions) veb.RawHtml {
-	mut render := v.script('${v.app_url}/@v/client', '')
+	mut render := v.script('${v.app_url}/@vite/client', '')
 
 	if options.use_react {
 		render = '${render}${v.react_script()}'
