@@ -1,4 +1,4 @@
-# Vite.v <span><img src="https://github.com/siguici/art/blob/HEAD/images/logo.svg" alt="⚡" width="24" /></span>
+# Vite.v <span><img src="https://github.com/siguici/art/blob/HEAD/images/v-vite.svg" alt="⚡" width="24" /></span>
 
 **Vite.v** is a V module designed to integrate **Veb**
 applications seamlessly with **Vite.js**.
