@@ -77,39 +77,39 @@ pub fn (mut v Vite) assets(names []string, options AssetOptions) veb.RawHtml {
 }
 
 pub fn (mut v Vite) asset(name string) veb.RawHtml {
-	asset := v.chunk(name)
-	file := asset.file
-
-	if file == '' {
-		panic('Unable to locate ${name} in Vite manifest.')
-	}
-
-	css := asset.css
-	imports := asset.imports
-
-	mut html := ''
 	mut base := ''
 	mut path := ''
+	mut html := ''
 
 	if v.is_hot() {
 		base = '${v.app_url()}/'
 		path = name
 	} else {
+		asset := v.chunk(name)
+		file := asset.file
+
+		if file == '' {
+			panic('Unable to locate ${name} in Vite manifest.')
+		}
+
 		base = '${v.app_url()}/${v.build_dir}/'
 		path = file
-	}
 
-	for css_file in css {
-		html += v.style(base + css_file)
-	}
+		css := asset.css
+		imports := asset.imports
 
-	for chunk in imports {
-		html += if v.is_css(chunk) {
-			v.style(base + chunk)
-		} else if v.is_js(chunk) {
-			v.preload(base + chunk)
-		} else {
-			''
+		for css_file in css {
+			html += v.style(base + css_file)
+		}
+
+		for chunk in imports {
+			html += if v.is_css(chunk) {
+				v.style(base + chunk)
+			} else if v.is_js(chunk) {
+				v.preload(base + chunk)
+			} else {
+				''
+			}
 		}
 	}
 
