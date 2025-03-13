@@ -78,23 +78,10 @@ pub fn (mut v Vite) assets(names []string, options AssetOptions) veb.RawHtml {
 
 pub fn (mut v Vite) asset(name string) veb.RawHtml {
 	mut base := ''
-	mut path := ''
 	mut html := ''
 
-	if v.is_hot() {
-		base = '${v.app_url()}/'
-		path = name
-	} else {
+	if !v.is_hot() {
 		asset := v.chunk(name)
-		file := asset.file
-
-		if file == '' {
-			panic('Unable to locate ${name} in Vite manifest.')
-		}
-
-		base = '${v.app_url()}/${v.build_dir}/'
-		path = file
-
 		css := asset.css
 		imports := asset.imports
 
@@ -113,15 +100,36 @@ pub fn (mut v Vite) asset(name string) veb.RawHtml {
 		}
 	}
 
-	html += if v.is_css(path) {
-		v.style(base + path)
-	} else if v.is_js(path) {
-		v.defer_script(base + path, '')
-	} else {
-		''
-	}
+	html += v.tag(name)
 
 	return html
+}
+
+pub fn (mut v Vite) url(path string) string {
+	return if v.is_hot() {
+		'${v.app_url()}/${path}'
+	} else {
+		asset := v.chunk(path)
+		file := asset.file
+
+		if file == '' {
+			panic('Unable to locate asset ${path} in Vite manifest.')
+		}
+
+		'${v.app_url()}/${v.build_dir}/${file}'
+	}
+}
+
+pub fn (mut v Vite) tag(path string) string {
+	url := v.url(path)
+
+	return if v.is_css(path) {
+		v.style(url)
+	} else if v.is_js(path) {
+		v.defer_script(url, '')
+	} else {
+		url
+	}
 }
 
 pub fn (mut v Vite) chunk(name string) ViteAsset {
