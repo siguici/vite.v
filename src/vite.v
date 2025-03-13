@@ -224,13 +224,8 @@ pub fn (v Vite) app_url() string {
 
 pub fn (mut v Vite) manifest() ViteManifest {
 	if !v.manifest_loaded {
-		manifest_path := v.manifest_path()
-
-		if !os.is_file(manifest_path) {
-			panic('Vite manifest ${manifest_path} not found.')
-		}
-
-		v.manifest = json.decode(ViteManifest, os.read_file(manifest_path) or { panic(err) }) or {
+		v.load_manifest() or {
+			eprintln(err)
 			panic(err)
 		}
 
@@ -238,4 +233,35 @@ pub fn (mut v Vite) manifest() ViteManifest {
 	}
 
 	return v.manifest
+}
+
+fn (mut v Vite) load_manifest() ! {
+	manifest_path := v.manifest_path()
+
+	if !os.is_file(manifest_path) {
+		panic('Vite manifest ${manifest_path} not found.')
+	}
+
+	v.manifest = json.decode(ViteManifest, os.read_file(manifest_path)!)!
+
+	v.add_manifest_assets()!
+}
+
+fn (mut v Vite) add_manifest_assets() ! {
+	for name, asset in v.manifest {
+		file := asset.file
+		if v.is_css(name) {
+			v.add_css(file, name)!
+		} else if v.is_js(name) {
+			v.add_js(file, name)!
+		}
+	}
+}
+
+pub fn (mut v Vite) add_css(file string, name string) ! {
+	v.add(.css, file, name)!
+}
+
+pub fn (mut v Vite) add_js(file string, name string) ! {
+	v.add(.js, file, name)!
 }
