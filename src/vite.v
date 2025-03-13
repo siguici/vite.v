@@ -15,7 +15,6 @@ pub struct ViteConfig {
 
 @[params]
 pub struct AssetOptions {
-	is_dev    bool
 	use_react bool
 }
 
@@ -26,8 +25,6 @@ mut:
 	hot_file        string @[required]
 	public_dir      string @[required]
 	build_dir       string @[required]
-	app_url         string = 'http://localhost:5173'
-	is_dev          bool
 	manifest        ViteManifest
 	manifest_loaded bool
 }
@@ -46,14 +43,12 @@ pub struct ViteAsset {
 pub type ViteManifest = map[string]ViteAsset
 
 pub fn Vite.new(config ViteConfig) Vite {
-	mut v := Vite{
+	return Vite{
 		manifest_file: config.manifest_file
 		hot_file:      config.hot_file
 		public_dir:    config.public_dir
 		build_dir:     config.build_dir
 	}
-
-	return v.init()
 }
 
 pub fn new_v(config ViteConfig) Vite {
@@ -71,8 +66,8 @@ pub fn (v Vite) hot_path() string {
 pub fn (mut v Vite) assets(names []string, options AssetOptions) veb.RawHtml {
 	mut render := ''
 
-	if options.is_dev || v.is_dev {
-		render = v.dev_scripts(options)
+	if v.is_hot() {
+		render = v.hot_scripts(options)
 	}
 
 	for name in names {
@@ -96,11 +91,11 @@ pub fn (mut v Vite) asset(name string) veb.RawHtml {
 	mut base := ''
 	mut path := ''
 
-	if v.is_dev {
-		base = '${v.app_url}/'
+	if v.is_hot() {
+		base = '${v.app_url()}/'
 		path = name
 	} else {
-		base = '${v.app_url}/${v.build_dir}/'
+		base = '${v.app_url()}/${v.build_dir}/'
 		path = file
 	}
 
@@ -157,8 +152,8 @@ fn (v Vite) is_js(path string) bool {
 	}
 }
 
-pub fn (v Vite) dev_scripts(options AssetOptions) veb.RawHtml {
-	mut render := v.script('${v.app_url}/@vite/client', '')
+pub fn (v Vite) hot_scripts(options AssetOptions) veb.RawHtml {
+	mut render := v.script('${v.app_url()}/@vite/client', '')
 
 	if options.use_react {
 		render = '${render}${v.react_script()}'
@@ -169,7 +164,7 @@ pub fn (v Vite) dev_scripts(options AssetOptions) veb.RawHtml {
 
 pub fn (v Vite) react_script() veb.RawHtml {
 	mut content := ''
-	content += 'import RefreshRuntime from "${v.app_url}/@react-refresh";'
+	content += 'import RefreshRuntime from "${v.app_url()}/@react-refresh";'
 	content += 'RefreshRuntime.injectIntoGlobalHook(window);'
 	content += 'window.\$RefreshReg\$ = () => {};'
 	content += 'window.\$RefreshSig\$ = () => (type) => type;'
@@ -215,18 +210,16 @@ pub fn (v Vite) defer_script(src string, content TagContent) string {
 	return new_script(attrs, content).str()
 }
 
-pub fn (mut v Vite) init() Vite {
-	hot_path := v.hot_path()
+pub fn (v Vite) is_hot() bool {
+	return os.is_file(v.hot_path())
+}
 
-	if os.is_file(hot_path) {
-		v.is_dev = true
-		v.app_url = os.read_file(hot_path) or { panic(err) }
+pub fn (v Vite) app_url() string {
+	return if v.is_hot() {
+		os.read_file(v.hot_path().trim_space()) or { panic(err) }
 	} else {
-		v.is_dev = false
-		v.app_url = os.getenv('APP_URL')
+		os.getenv('APP_URL')
 	}
-
-	return v
 }
 
 pub fn (mut v Vite) manifest() ViteManifest {
