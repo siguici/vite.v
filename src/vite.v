@@ -77,11 +77,18 @@ pub fn (mut v Vite) assets(names []string, options AssetOptions) veb.RawHtml {
 }
 
 pub fn (mut v Vite) asset(name string) veb.RawHtml {
+	return v.asset_opt(name) or {
+		eprintln(err)
+		''
+	}
+}
+
+pub fn (mut v Vite) asset_opt(name string) !veb.RawHtml {
 	mut base := ''
 	mut html := ''
 
 	if !v.is_hot() {
-		asset := v.chunk(name)
+		asset := v.chunk_opt(name)!
 		css := asset.css
 		imports := asset.imports
 
@@ -106,14 +113,21 @@ pub fn (mut v Vite) asset(name string) veb.RawHtml {
 }
 
 pub fn (mut v Vite) url(path string) string {
+	return v.url_opt(path) or {
+		eprintln(err)
+		''
+	}
+}
+
+pub fn (mut v Vite) url_opt(path string) !string {
 	return if v.is_hot() {
 		'${v.app_url()}/${path}'
 	} else {
-		asset := v.chunk(path)
+		asset := v.chunk_opt(path)!
 		file := asset.file
 
 		if file == '' {
-			panic('Unable to locate asset ${path} in Vite manifest.')
+			error('Unable to locate asset ${path} in Vite manifest.')
 		}
 
 		'${v.app_url()}/${v.build_dir}/${file}'
@@ -121,7 +135,14 @@ pub fn (mut v Vite) url(path string) string {
 }
 
 pub fn (mut v Vite) tag(path string) string {
-	url := v.url(path)
+	return v.tag_opt(path) or {
+		eprintln(err)
+		''
+	}
+}
+
+pub fn (mut v Vite) tag_opt(path string) !string {
+	url := v.url_opt(path)!
 
 	return if v.is_css(path) {
 		v.style(url)
@@ -133,7 +154,17 @@ pub fn (mut v Vite) tag(path string) string {
 }
 
 pub fn (mut v Vite) chunk(name string) ViteAsset {
-	manifest := v.manifest()
+	return v.chunk_opt(name) or {
+		eprintln(err)
+		ViteAsset{
+			file: ''
+			name: name
+		}
+	}
+}
+
+pub fn (mut v Vite) chunk_opt(name string) !ViteAsset {
+	manifest := v.manifest()!
 
 	return manifest[name]
 }
@@ -223,19 +254,24 @@ pub fn (v Vite) is_hot() bool {
 }
 
 pub fn (v Vite) app_url() string {
+	return v.app_url_opt() or {
+		eprintln(err)
+		''
+	}
+}
+
+pub fn (v Vite) app_url_opt() !string {
 	return if v.is_hot() {
-		os.read_file(v.hot_path().trim_space()) or { panic(err) }
+		hot_file := v.hot_path().trim_space()
+		os.read_file(hot_file) or { error('Unable to read hot file ${hot_file}: ${err}') }
 	} else {
 		os.getenv('APP_URL')
 	}
 }
 
-pub fn (mut v Vite) manifest() ViteManifest {
+pub fn (mut v Vite) manifest() !ViteManifest {
 	if !v.manifest_loaded {
-		v.load_manifest() or {
-			eprintln(err)
-			panic(err)
-		}
+		v.load_manifest()!
 
 		v.manifest_loaded = true
 	}
@@ -247,7 +283,7 @@ fn (mut v Vite) load_manifest() ! {
 	manifest_path := v.manifest_path()
 
 	if !os.is_file(manifest_path) {
-		panic('Vite manifest ${manifest_path} not found.')
+		error('Vite manifest ${manifest_path} not found.')
 	}
 
 	v.manifest = json.decode(ViteManifest, os.read_file(manifest_path)!)!
