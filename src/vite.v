@@ -179,6 +179,8 @@ pub fn (mut v Vite) tag_opt(path string) !string {
 		v.style(url)
 	} else if v.is_js(path) {
 		v.defer_script(url, '')
+	} else if v.is_img(path) {
+		v.image(url, '')
 	} else {
 		url
 	}
@@ -218,6 +220,17 @@ fn (v Vite) is_css(path string) bool {
 fn (v Vite) is_js(path string) bool {
 	return match os.file_ext(path) {
 		'.js', '.cjs', '.mjs', '.jsx', '.ts', '.tsx', '.cts', '.mts' {
+			true
+		}
+		else {
+			false
+		}
+	}
+}
+
+fn (v Vite) is_img(path string) bool {
+	return match os.file_ext(path) {
+		'.png', '.jpg', '.jpeg', '.svg', '.webp', '.gif' {
 			true
 		}
 		else {
@@ -282,6 +295,14 @@ pub fn (v Vite) defer_script(src string, content TagContent) string {
 	]
 
 	return new_script(attrs, content).str()
+}
+
+pub fn (v Vite) image(src string, alt string) string {
+	attrs := [
+		new_attribute('src', src),
+		new_attribute('alt', alt),
+	]
+	return new_image(attrs).str()
 }
 
 pub fn (v Vite) is_hot() bool {

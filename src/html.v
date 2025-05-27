@@ -52,8 +52,8 @@ pub fn (attrs []Attribute) str() string {
 }
 
 pub fn (tag Tag) str() string {
-	return if tag.name == 'link' {
-		'<link${tag.attrs.str()}>'
+	return if tag.name == 'link' || tag.name == 'img' {
+		'<${tag.name}${tag.attrs.str()}>'
 	} else {
 		content := if tag.content is string { tag.content } else { tag.content.str() }
 		'<${tag.name}${tag.attrs.str()}>${content}</${tag.name}>'
@@ -91,4 +91,8 @@ pub fn new_style(attrs []Attribute, content TagContent) Tag {
 
 pub fn new_script(attrs []Attribute, content TagContent) Tag {
 	return new_tag('script', attrs, content)
+}
+
+pub fn new_image(attrs []Attribute) Tag {
+	return new_tag('img', attrs, '')
 }
