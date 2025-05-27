@@ -111,6 +111,32 @@ For injecting entrypoints (scripts, styles, and their dependencies):
 @{app.vite.input_assets()}
 ```
 
+### 🧱 Helpers
+
+- `tag(path)`
+
+Generate the appropriate HTML tag (`<script>`, `<link>`, or `<img>`)
+based on the file extension:
+
+```html
+@{app.vite.tag('src/resources/app.ts')}
+@{app.vite.tag('src/resources/app.css')}
+@{app.vite.tag('images/logo.png')}
+```
+
+- `url(path)`
+
+Get the fully resolved URL of an asset, including APP_URL if defined:
+
+```html
+<link rel="icon" href="@{app.vite.url('favicon.ico')}" />
+<img src="@{app.vite.url('images/logo.png')}" alt="Logo" />
+<script type="module" src="@{app.vite.url('src/resources/app.ts')}"></script>
+```
+
+These helpers ensure consistent behavior in development (via the Vite server)
+and in production (via the manifest).
+
 ## 🤝 Contributing
 
 Contributions are welcome! Feel free to submit issues
