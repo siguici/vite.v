@@ -63,6 +63,17 @@ pub fn (v Vite) hot_path() string {
 	return '${v.public_dir}/${v.hot_file}'
 }
 
+pub fn (mut v Vite) entrypoints(names []string, options AssetOptions) []ViteAsset {
+	return v.entrypoints_opt(names, options) or {
+		eprintln(err)
+		[]
+	}
+}
+
+pub fn (mut v Vite) entrypoints_opt(names []string, options AssetOptions) ![]ViteAsset {
+	return v.manifest()!.values().filter(it.is_entry)
+}
+
 pub fn (mut v Vite) assets(names []string, options AssetOptions) veb.RawHtml {
 	return v.assets_opt(names, options) or {
 		eprintln(err)
@@ -84,6 +95,7 @@ pub fn (mut v Vite) assets_opt(names []string, options AssetOptions) !veb.RawHtm
 	for name in names {
 		render = '${render}${v.asset_opt(name)!}'
 	}
+
 	return render
 }
 
