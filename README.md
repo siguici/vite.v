@@ -88,6 +88,29 @@ struct ViteConfig {
 }
 ```
 
+### 🧩 Injecting Assets in Templates
+
+You can inject scripts and styles into your templates using either:
+
+- `vite.assets`
+
+For manually injecting specific assets (CSS/JS):
+
+```html
+@{app.vite.assets([
+  'src/resources/app.css',
+  'src/resources/app.ts'
+])}
+```
+
+- `vite.input_assets`
+
+For injecting entrypoints (scripts, styles, and their dependencies):
+
+```html
+@{app.vite.input_assets()}
+```
+
 ## 🤝 Contributing
 
 Contributions are welcome! Feel free to submit issues
