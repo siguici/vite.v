@@ -119,6 +119,10 @@ pub fn (mut v Vite) url(path string) string {
 	}
 }
 
+pub fn (mut v Vite) url_or_panic(path string) string {
+	return v.url_opt(path) or { panic(err) }
+}
+
 pub fn (mut v Vite) url_opt(path string) !string {
 	return if v.is_hot() {
 		'${v.app_url()}/${path}'
@@ -139,6 +143,10 @@ pub fn (mut v Vite) tag(path string) string {
 		eprintln(err)
 		''
 	}
+}
+
+pub fn (mut v Vite) tag_or_panic(path string) string {
+	return v.tag_opt(path) or { panic(err) }
 }
 
 pub fn (mut v Vite) tag_opt(path string) !string {
@@ -167,6 +175,10 @@ pub fn (mut v Vite) chunk_opt(name string) !ViteAsset {
 	manifest := v.manifest()!
 
 	return manifest[name]
+}
+
+pub fn (mut v Vite) chunk_or_panic(name string) ViteAsset {
+	return v.chunk_opt(name) or { panic(err) }
 }
 
 fn (v Vite) is_css(path string) bool {
