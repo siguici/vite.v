@@ -64,6 +64,17 @@ pub fn (v Vite) hot_path() string {
 }
 
 pub fn (mut v Vite) assets(names []string, options AssetOptions) veb.RawHtml {
+	return v.assets_opt(names, options) or {
+		eprintln(err)
+		''
+	}
+}
+
+pub fn (mut v Vite) assets_or_panic(names []string, options AssetOptions) veb.RawHtml {
+	return v.assets_opt(names, options) or { panic(err) }
+}
+
+pub fn (mut v Vite) assets_opt(names []string, options AssetOptions) !veb.RawHtml {
 	mut render := ''
 
 	if v.is_hot() {
@@ -71,7 +82,7 @@ pub fn (mut v Vite) assets(names []string, options AssetOptions) veb.RawHtml {
 	}
 
 	for name in names {
-		render = '${render}${v.asset(name)}'
+		render = '${render}${v.asset_opt(name)!}'
 	}
 	return render
 }
