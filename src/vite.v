@@ -15,7 +15,8 @@ pub struct ViteConfig {
 
 @[params]
 pub struct AssetOptions {
-	use_react bool
+	use_react      bool
+	preload_assets bool
 }
 
 pub struct Vite {
@@ -37,6 +38,7 @@ pub struct ViteAsset {
 	is_dynamic_entry bool
 	css              []string
 	imports          []string
+	assets           []string
 	dynamic_imports  []string
 }
 
@@ -117,20 +119,20 @@ pub fn (mut v Vite) assets_opt(names []string, options AssetOptions) !veb.RawHtm
 	}
 
 	for name in names {
-		render = '${render}${v.asset_opt(name)!}'
+		render = '${render}${v.asset_opt(name, options)!}'
 	}
 
 	return render
 }
 
-pub fn (mut v Vite) asset(name string) veb.RawHtml {
-	return v.asset_opt(name) or {
+pub fn (mut v Vite) asset(name string, options AssetOptions) veb.RawHtml {
+	return v.asset_opt(name, options) or {
 		eprintln(err)
 		''
 	}
 }
 
-pub fn (mut v Vite) asset_opt(name string) !veb.RawHtml {
+pub fn (mut v Vite) asset_opt(name string, options AssetOptions) !veb.RawHtml {
 	mut base := ''
 	mut html := ''
 
@@ -140,16 +142,24 @@ pub fn (mut v Vite) asset_opt(name string) !veb.RawHtml {
 		imports := asset.imports
 
 		for css_file in css {
-			html += v.style(base + css_file)
+			html += v.style(v.url_opt(base + css_file)!)
 		}
 
 		for chunk in imports {
 			html += if v.is_css(chunk) {
 				v.style(base + chunk)
 			} else if v.is_js(chunk) {
-				v.preload(base + chunk)
+				v.preload_script(base + chunk)
 			} else {
 				''
+			}
+		}
+
+		if options.preload_assets {
+			asset_assets := asset.assets
+
+			for asset_file in asset_assets {
+				html += v.preload_asset(base + asset_file)
 			}
 		}
 	}
@@ -291,11 +301,120 @@ pub fn (v Vite) style(href string) string {
 	return new_style(attrs, '').str()
 }
 
-pub fn (v Vite) preload(href string) string {
+fn (v Vite) preload_script(href string) string {
 	attrs := [
 		new_attribute('rel', 'modulepreload'),
 		new_attribute('href', href),
 	]
+	return new_tag('link', attrs, '').str()
+}
+
+fn (v Vite) preload_asset(path string) string {
+	ext := os.file_ext(path).after('.').to_lower()
+	mut use_as := ''
+	mut mime := ''
+	mut crossorigin := false
+
+	match ext {
+		// Fonts
+		'woff2' {
+			use_as = 'font'
+			mime = 'font/woff2'
+			crossorigin = true
+		}
+		'woff' {
+			use_as = 'font'
+			mime = 'font/woff'
+			crossorigin = true
+		}
+		'ttf' {
+			use_as = 'font'
+			mime = 'font/ttf'
+			crossorigin = true
+		}
+		'otf' {
+			use_as = 'font'
+			mime = 'font/otf'
+			crossorigin = true
+		}
+		'eot' {
+			use_as = 'font'
+			mime = 'application/vnd.ms-fontobject'
+			crossorigin = true
+		}
+		// Images
+		'jpg', 'jpeg' {
+			use_as = 'image'
+			mime = 'image/jpeg'
+		}
+		'png' {
+			use_as = 'image'
+			mime = 'image/png'
+		}
+		'gif' {
+			use_as = 'image'
+			mime = 'image/gif'
+		}
+		'webp' {
+			use_as = 'image'
+			mime = 'image/webp'
+		}
+		'avif' {
+			use_as = 'image'
+			mime = 'image/avif'
+		}
+		'svg' {
+			use_as = 'image'
+			mime = 'image/svg+xml'
+		}
+		'ico' {
+			use_as = 'image'
+			mime = 'image/x-icon'
+		}
+		// Audios
+		'mp3' {
+			use_as = 'audio'
+			mime = 'audio/mpeg'
+		}
+		'ogg' {
+			use_as = 'audio'
+			mime = 'audio/ogg'
+		}
+		'wav' {
+			use_as = 'audio'
+			mime = 'audio/wav'
+		}
+		// Videos
+		'mp4' {
+			use_as = 'video'
+			mime = 'video/mp4'
+		}
+		'webm' {
+			use_as = 'video'
+			mime = 'video/webm'
+		}
+		'ogv' {
+			use_as = 'video'
+			mime = 'video/ogg'
+		}
+		// Documents
+		'pdf' {
+			use_as = 'document'
+			mime = 'application/pdf'
+		}
+		else {
+			return ''
+		}
+	}
+
+	attrs := [
+		new_attribute('rel', 'preload'),
+		new_attribute('href', path),
+		new_attribute('as', use_as),
+		new_attribute('type', mime),
+		new_attribute('crossorigin', crossorigin),
+	]
+
 	return new_tag('link', attrs, '').str()
 }
 
