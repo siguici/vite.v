@@ -56,11 +56,27 @@ pub fn new_v(config ViteConfig) Vite {
 }
 
 pub fn (v Vite) manifest_path() string {
-	return '${v.public_dir}/${v.build_dir}/${v.manifest_file}'
+	return v.public_file(v.manifest_file)
 }
 
 pub fn (v Vite) hot_path() string {
-	return '${v.public_dir}/${v.hot_file}'
+	return if v.public_dir == '' {
+		v.hot_file
+	} else {
+		'${v.public_dir}/${v.hot_file}'
+	}
+}
+
+pub fn (v Vite) public_file(path string) string {
+	return if v.public_dir == '' { path } else { '${v.public_dir}/${path}' }
+}
+
+pub fn (v Vite) build_file(path string) string {
+	return if v.build_dir == '' {
+		v.public_file(path)
+	} else {
+		v.public_file('${v.build_dir}/${path}')
+	}
 }
 
 pub fn (mut v Vite) entrypoints() []ViteAsset {
@@ -357,7 +373,7 @@ fn (mut v Vite) load_manifest() ! {
 
 fn (mut v Vite) add_manifest_assets() ! {
 	for name, asset in v.manifest {
-		file := asset.file
+		file := v.build_file(asset.file)
 		if v.is_css(name) {
 			v.add_css(file, name)!
 		} else if v.is_js(name) {
