@@ -56,7 +56,7 @@ pub fn new_v(config ViteConfig) Vite {
 }
 
 pub fn (v Vite) manifest_path() string {
-	return v.public_file(v.manifest_file)
+	return v.build_file(v.manifest_file)
 }
 
 pub fn (v Vite) hot_path() string {
