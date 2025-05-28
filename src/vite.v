@@ -7,6 +7,7 @@ import veb.assets
 
 @[params]
 pub struct ViteConfig {
+pub:
 	manifest_file string = 'manifest.json'
 	hot_file      string = 'hot'
 	public_dir    string = 'public'
@@ -15,6 +16,7 @@ pub struct ViteConfig {
 
 @[params]
 pub struct AssetOptions {
+pub:
 	use_react      bool
 	preload_assets bool
 }
