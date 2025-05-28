@@ -133,7 +133,6 @@ pub fn (mut v Vite) asset(name string, options AssetOptions) veb.RawHtml {
 }
 
 pub fn (mut v Vite) asset_opt(name string, options AssetOptions) !veb.RawHtml {
-	mut base := ''
 	mut html := ''
 
 	if !v.is_hot() {
@@ -142,14 +141,15 @@ pub fn (mut v Vite) asset_opt(name string, options AssetOptions) !veb.RawHtml {
 		imports := asset.imports
 
 		for css_file in css {
-			html += v.style(v.url_opt(base + css_file)!)
+			html += v.style(v.build_url(css_file))
 		}
 
 		for chunk in imports {
+			chunk_url := v.build_url(chunk)
 			html += if v.is_css(chunk) {
-				v.style(base + chunk)
+				v.style(chunk_url)
 			} else if v.is_js(chunk) {
-				v.preload_script(base + chunk)
+				v.preload_script(chunk_url)
 			} else {
 				''
 			}
@@ -157,9 +157,8 @@ pub fn (mut v Vite) asset_opt(name string, options AssetOptions) !veb.RawHtml {
 
 		if options.preload_assets {
 			asset_assets := asset.assets
-
 			for asset_file in asset_assets {
-				html += v.preload_asset(base + asset_file)
+				html += v.preload_asset(v.build_url(asset_file))
 			}
 		}
 	}
@@ -182,7 +181,7 @@ pub fn (mut v Vite) url_or_panic(path string) string {
 
 pub fn (mut v Vite) url_opt(path string) !string {
 	return if v.is_hot() {
-		'${v.app_url()}/${path}'
+		v.hot_url(path)
 	} else {
 		asset := v.chunk_opt(path)!
 		file := asset.file
@@ -191,7 +190,7 @@ pub fn (mut v Vite) url_opt(path string) !string {
 			error('Unable to locate asset ${path} in Vite manifest.')
 		}
 
-		'${v.app_url()}/${v.build_dir}/${file}'
+		v.build_url(file)
 	}
 }
 
@@ -452,6 +451,10 @@ pub fn (v Vite) is_hot() bool {
 	return os.is_file(v.hot_path())
 }
 
+pub fn (v Vite) hot_url(path string) string {
+	return '${v.app_url()}/${path}'
+}
+
 pub fn (v Vite) app_url() string {
 	return v.app_url_opt() or {
 		eprintln(err)
@@ -466,6 +469,10 @@ pub fn (v Vite) app_url_opt() !string {
 	} else {
 		os.getenv('APP_URL')
 	}
+}
+
+pub fn (v Vite) build_url(path string) string {
+	return if v.build_dir == '' { v.hot_url(path) } else { '${v.app_url()}/${v.build_dir}/${path}' }
 }
 
 pub fn (mut v Vite) manifest() !ViteManifest {
