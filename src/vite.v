@@ -55,7 +55,7 @@ pub fn Vite.new(config ViteConfig) Vite {
 	}
 }
 
-pub fn new_v(config ViteConfig) Vite {
+pub fn new(config ViteConfig) Vite {
 	return Vite.new(config)
 }
 
