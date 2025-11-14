@@ -46,6 +46,13 @@ pub struct ViteAsset {
 
 pub type ViteManifest = map[string]ViteAsset
 
+pub struct ViteContext {
+pub mut:
+	config ViteConfig
+mut:
+	vite &Vite = unsafe { nil }
+}
+
 pub fn Vite.new(config ViteConfig) Vite {
 	return Vite{
 		manifest_file: config.manifest_file
@@ -516,4 +523,12 @@ pub fn (mut v Vite) add_css(file string, name string) ! {
 
 pub fn (mut v Vite) add_js(file string, name string) ! {
 	v.add(.js, file, name)!
+}
+
+pub fn (mut ctx ViteContext) vite() &Vite {
+	if ctx.vite == unsafe { nil } {
+		v := Vite.new(ctx.config)
+		ctx.vite = &v
+	}
+	return ctx.vite
 }
