@@ -31,8 +31,8 @@ v install siguici.vite
 ### Via Git
 
 ```sh
-mkdir -p ${V_MODULES:-$HOME/.vmodules}/siguici
-git clone --depth=1 https://github.com/siguici/vite ${V_MODULES:-$HOME/.vmodules}/siguici/vite
+mkdir -p ${VMODULES:-$HOME/.vmodules}/siguici
+git clone --depth=1 https://github.com/siguici/vite ${VMODULES:-$HOME/.vmodules}/siguici/vite
 ```
 
 ### As a project dependency
