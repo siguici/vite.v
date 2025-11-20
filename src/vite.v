@@ -535,47 +535,47 @@ pub fn (mut ctx ViteContext) vite() &Vite {
 	return ctx.vite
 }
 
-pub fn (mut ctx ViteContext) entrypoints() []ViteAsset {
+pub fn (mut ctx ViteContext) vite_entrypoints() []ViteAsset {
 	mut v := ctx.vite()
 	return v.entrypoints()
 }
 
-pub fn (mut ctx ViteContext) chunk(name string) ViteAsset {
+pub fn (mut ctx ViteContext) vite_chunk(name string) ViteAsset {
 	mut v := ctx.vite()
 	return v.chunk(name)
 }
 
-pub fn (mut ctx ViteContext) input_assets(options AssetOptions) veb.RawHtml {
+pub fn (mut ctx ViteContext) vite_input_assets(options AssetOptions) veb.RawHtml {
 	mut v := ctx.vite()
 	return v.input_assets(options)
 }
 
-pub fn (mut ctx ViteContext) assets(names []string, options AssetOptions) veb.RawHtml {
+pub fn (mut ctx ViteContext) vite_assets(names []string, options AssetOptions) veb.RawHtml {
 	mut v := ctx.vite()
 	return v.assets(names, options)
 }
 
-pub fn (mut ctx ViteContext) asset(name string, options AssetOptions) veb.RawHtml {
+pub fn (mut ctx ViteContext) vite_asset(name string, options AssetOptions) veb.RawHtml {
 	mut v := ctx.vite()
 	return v.asset(name, options)
 }
 
-pub fn (mut ctx ViteContext) url(path string) string {
+pub fn (mut ctx ViteContext) vite_url(path string) string {
 	mut v := ctx.vite()
 	return v.url(path)
 }
 
-pub fn (mut ctx ViteContext) tag(path string) veb.RawHtml {
+pub fn (mut ctx ViteContext) vite_tag(path string) veb.RawHtml {
 	mut v := ctx.vite()
 	return v.tag(path)
 }
 
-pub fn (mut ctx ViteContext) hot_scripts(options AssetOptions) veb.RawHtml {
+pub fn (mut ctx ViteContext) vite_hot_scripts(options AssetOptions) veb.RawHtml {
 	mut v := ctx.vite()
 	return v.hot_scripts(options)
 }
 
-pub fn (mut ctx ViteContext) react_script() veb.RawHtml {
+pub fn (mut ctx ViteContext) vite_react_script() veb.RawHtml {
 	mut v := ctx.vite()
 	return v.react_script()
 }
