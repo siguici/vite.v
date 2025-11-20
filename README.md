@@ -102,21 +102,18 @@ This pattern is useful when working inside frameworks like **Veb**:
 module main
 
 import veb
-import siguici.vite { Vite }
+import siguici.vite
 
 pub struct Context {
     veb.Context
+    vite.ViteContext
 }
 
 pub struct App {
-pub mut:
-    vite Vite
 }
 
 fn main() {
-    mut app := &App{
-        vite: Vite.new()
-    }
+    mut app := &App{}
     veb.run[App, Context](mut app, 8080)
 }
 ```
@@ -128,17 +125,14 @@ fn main() {
 <html lang="en">
 <head>
   <!-- Inject assets -->
-  @{vite.assets([
+  @{ctx.vite_assets([
     'src/resources/app.css',
     'src/resources/app.ts'
   ])}
 
   <!-- Or generate individual tags -->
-  @{vite.tag('src/resources/app.css')}
-  @{vite.tag('src/resources/app.ts')}
-
-  <!-- Preload images -->
-  @{vite.preload_tag('src/assets/logo.png')}
+  @{ctx.vite_tag('src/resources/app.css')}
+  @{ctx.vite_tag('src/resources/app.ts')}
 </head>
 <body>
   <h1>Hello Vite + Veb!</h1>
