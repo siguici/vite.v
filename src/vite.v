@@ -48,7 +48,7 @@ pub type ViteManifest = map[string]ViteAsset
 
 pub struct ViteContext {
 pub mut:
-	config ViteConfig
+	vite_config ViteConfig
 mut:
 	vite &Vite = unsafe { nil }
 }
@@ -526,10 +526,11 @@ pub fn (mut v Vite) add_js(file string, name string) ! {
 }
 
 pub fn (mut ctx ViteContext) vite() &Vite {
-	if ctx.vite == unsafe { nil } || ctx.vite.manifest_file != ctx.config.manifest_file
-		|| ctx.vite.hot_file != ctx.config.hot_file || ctx.vite.public_dir != ctx.config.public_dir
-		|| ctx.vite.build_dir != ctx.config.build_dir {
-		v := Vite.new(ctx.config)
+	if ctx.vite == unsafe { nil } || ctx.vite.manifest_file != ctx.vite_config.manifest_file
+		|| ctx.vite.hot_file != ctx.vite_config.hot_file
+		|| ctx.vite.public_dir != ctx.vite_config.public_dir
+		|| ctx.vite.build_dir != ctx.vite_config.build_dir {
+		v := Vite.new(ctx.vite_config)
 		ctx.vite = &v
 	}
 	return ctx.vite
